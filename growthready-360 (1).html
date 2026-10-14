@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GrowthReady 360 | CQI360</title>
+<style>
+  :root{
+    --navy:#0D2137; --teal:#0B7A75; --teal-light:#14A5A0; --gold:#F4A825;
+    --slate:#334155; --bg:#F7F8FA; --card:#FFFFFF; --border:#E2E5EA;
+    --red:#C0392B; --amber:#D68910; --green:#1E8449;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:Calibri,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--bg);color:var(--slate);line-height:1.5;}
+  h1,h2,h3{font-family:Georgia,Cambria,'Times New Roman',serif;color:var(--navy);}
+  .app-header{background:var(--navy);color:#fff;padding:26px 20px 20px;}
+  .app-header .inner{max-width:900px;margin:0 auto;}
+  .brand{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+  .brand-badge{background:var(--gold);color:var(--navy);font-weight:bold;font-family:Georgia,serif;padding:3px 10px;border-radius:4px;font-size:0.85rem;}
+  .app-header h1{color:#fff;font-size:1.6rem;margin:0 0 6px;}
+  .app-header p{margin:0;color:#C9D4DE;font-size:0.95rem;}
+  .meta-row{display:flex;gap:16px;margin-top:12px;font-size:0.8rem;color:#9FB0C2;flex-wrap:wrap;}
+  .meta-row span{display:flex;align-items:center;gap:5px;}
+  .wrap{max-width:900px;margin:0 auto;padding:22px 20px 60px;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:26px 24px;box-shadow:0 1px 3px rgba(13,33,55,0.06);margin-bottom:18px;}
+  .screen{display:none;}
+  .screen.active{display:block;}
+
+  /* Intro */
+  .select-group{margin-bottom:22px;}
+  .select-group h3{font-size:1.05rem;margin:0 0 4px;}
+  .select-group .sub{font-size:0.85rem;color:#8592A3;margin-bottom:12px;}
+  .option-card{display:flex;align-items:flex-start;gap:10px;border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:8px;cursor:pointer;background:#FCFCFD;}
+  .option-card:hover{border-color:var(--teal-light);}
+  .option-card.selected{border-color:var(--teal);background:#EAF6F5;}
+  .option-card input{margin-top:3px;accent-color:var(--teal);}
+  .option-card .ot{font-weight:600;color:var(--navy);font-size:0.92rem;}
+  .option-card .od{font-size:0.82rem;color:#64748B;margin-top:2px;}
+  select.industry-select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:0.9rem;color:var(--slate);background:#FCFCFD;}
+
+  .btn{border:none;border-radius:6px;padding:12px 20px;font-weight:600;font-size:0.92rem;cursor:pointer;font-family:inherit;}
+  .btn-primary{background:var(--teal);color:#fff;}
+  .btn-primary:hover{background:var(--navy);}
+  .btn-primary:disabled{opacity:0.4;cursor:not-allowed;}
+  .btn-secondary{background:#fff;border:1px solid var(--border);color:var(--slate);}
+  .btn-secondary:hover{border-color:var(--teal-light);}
+
+  /* Assessment */
+  .progress-wrap{position:sticky;top:0;background:var(--bg);padding:10px 0;z-index:10;}
+  .progress-bar{height:6px;background:#E2E5EA;border-radius:3px;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--teal);width:0%;transition:width 0.2s;}
+  .progress-label{font-size:0.78rem;color:#8592A3;margin-top:4px;}
+  .dim-block{margin-bottom:26px;}
+  .dim-block h3{font-size:1.05rem;margin:0 0 2px;}
+  .dim-block .dq{font-size:0.85rem;color:#64748B;margin-bottom:12px;font-style:italic;}
+  .indicator{border-top:1px solid var(--border);padding:14px 0;}
+  .indicator:first-of-type{border-top:none;}
+  .indicator p{font-size:0.92rem;color:var(--slate);margin:0 0 10px;font-weight:500;}
+  .likert{display:flex;flex-wrap:wrap;gap:6px;}
+  .likert label{flex:1 1 auto;min-width:88px;text-align:center;border:1px solid var(--border);border-radius:6px;padding:8px 6px;font-size:0.76rem;cursor:pointer;background:#FCFCFD;color:#64748B;}
+  .likert input{display:none;}
+  .likert input:checked + span{display:block;}
+  .likert label.checked{border-color:var(--teal);background:var(--teal);color:#fff;font-weight:600;}
+  .likert label.na.checked{border-color:#8592A3;background:#8592A3;}
+
+  /* Results */
+  .score-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+  .score-row .lbl{width:230px;flex-shrink:0;font-size:0.86rem;font-weight:600;color:var(--navy);}
+  .score-row .bar-track{flex:1;background:#EEF1F4;border-radius:5px;height:18px;overflow:hidden;}
+  .score-row .bar-fill{height:100%;border-radius:5px;transition:width 0.4s;}
+  .score-row .val{width:48px;text-align:right;font-size:0.82rem;font-weight:600;color:var(--slate);flex-shrink:0;}
+  .axis-row{display:flex;margin:4px 0 16px;padding-left:242px;font-size:0.68rem;color:#A6AEBA;}
+  .axis-row span{flex:1;text-align:right;}
+
+  .insight-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0;}
+  @media(max-width:620px){.insight-grid{grid-template-columns:1fr;}}
+  .insight-card{border-radius:8px;padding:14px 16px;}
+  .insight-card.strong{background:#EAF7EE;border:1px solid #BEE3C8;}
+  .insight-card.priority{background:#FDF1E3;border:1px solid #F3D9AE;}
+  .insight-card .k{font-size:0.72rem;text-transform:uppercase;font-weight:bold;letter-spacing:0.5px;margin-bottom:4px;}
+  .insight-card.strong .k{color:var(--green);}
+  .insight-card.priority .k{color:var(--amber);}
+  .insight-card .v{font-size:0.98rem;font-weight:700;color:var(--navy);}
+
+  .note-block{background:#FCFCFD;border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:12px;}
+  .note-block h4{margin:0 0 6px;font-size:0.92rem;color:var(--navy);font-family:Georgia,serif;}
+  .note-block p{margin:0;font-size:0.87rem;color:var(--slate);}
+  .rec-list{list-style:none;padding:0;margin:0;}
+  .rec-list li{display:flex;gap:10px;padding:10px 0;border-top:1px solid var(--border);}
+  .rec-list li:first-child{border-top:none;}
+  .rec-list .num{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--teal);color:#fff;font-size:0.78rem;font-weight:bold;display:flex;align-items:center;justify-content:center;}
+  .rec-list .txt{font-size:0.88rem;color:var(--slate);}
+
+  .disclaimer{font-size:0.76rem;color:#A6AEBA;font-style:italic;margin:14px 0;}
+
+  .cta-box{background:linear-gradient(135deg,var(--navy),#123049);color:#fff;border-radius:10px;padding:22px;margin-top:20px;}
+  .cta-box h3{color:#fff;font-size:1.05rem;margin:0 0 8px;}
+  .cta-box p{color:#C9D4DE;font-size:0.9rem;margin:0 0 16px;}
+  .cta-actions{display:flex;flex-wrap:wrap;gap:10px;}
+  .cta-actions a,.cta-actions button{display:inline-block;text-decoration:none;padding:10px 16px;border-radius:6px;font-size:0.85rem;font-weight:600;cursor:pointer;font-family:inherit;border:none;}
+  .cta-gold{background:var(--gold);color:var(--navy);}
+  .cta-outline{background:transparent;border:1px solid #55708A !important;color:#fff;}
+
+  .nav-row{display:flex;justify-content:space-between;margin-top:18px;gap:10px;}
+  footer{text-align:center;color:#8592A3;font-size:0.78rem;padding:20px 0 40px;}
+  footer .fbrand{color:var(--navy);font-weight:bold;}
+
+  @media print{
+    .app-header,.nav-row,.progress-wrap,.cta-actions{display:none !important;}
+    body{background:#fff;}
+    .card{box-shadow:none;border:none;}
+    .screen{display:block !important;}
+  }
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="inner">
+    <div class="brand"><span class="brand-badge">CQI360</span><span style="font-size:0.8rem;color:#9FB0C2;">Organizational Growth & Capability Self-Study</span></div>
+    <h1>GrowthReady 360</h1>
+    <p>Your business is growing. Are your systems, people, and processes keeping up? This self-study helps you see where you're positioned to scale, where friction may be developing, and where a closer look could make the biggest difference.</p>
+    <div class="meta-row">
+      <span>&#9201; 10&ndash;12 minutes</span>
+      <span>&#9776; 6 dimensions &middot; 24 indicators</span>
+      <span>&#128274; No login, nothing saved or sent anywhere</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- SCREEN 0: INTRO -->
+  <div class="screen active" id="screen-intro">
+    <div class="card">
+      <div class="select-group">
+        <h3>Which best describes your organization?</h3>
+        <div class="sub">This helps frame the context for your results &mdash; it doesn't change your scores.</div>
+        <div id="stageOptions"></div>
+      </div>
+      <div class="select-group">
+        <h3>Industry <span style="font-weight:400;color:#8592A3;">(optional)</span></h3>
+        <div class="sub">If your industry isn't listed, or you'd rather skip this, leave it on General.</div>
+        <select class="industry-select" id="industrySelect"></select>
+      </div>
+      <button class="btn btn-primary" id="beginBtn" disabled>Begin the self-study &rarr;</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 1: ASSESSMENT -->
+  <div class="screen" id="screen-assessment">
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-label" id="progressLabel">0 of 24 answered</div>
+    </div>
+    <div class="card" id="dimContainer"></div>
+    <div class="nav-row">
+      <button class="btn btn-secondary" id="backToIntroBtn">&larr; Back</button>
+      <button class="btn btn-primary" id="viewResultsBtn" disabled>View My Results &rarr;</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: RESULTS -->
+  <div class="screen" id="screen-results">
+    <div class="card">
+      <h2 style="margin-top:0;">Your Growth Readiness Profile</h2>
+      <p class="disclaimer" style="margin-top:0;">Illustrative self-ratings based on your own responses &mdash; not an empirical benchmark or a validated readiness index.</p>
+      <div id="barChart"></div>
+      <div class="axis-row"><span>0</span><span>1.25</span><span>2.5</span><span>3.75</span><span>5</span></div>
+
+      <div class="insight-grid">
+        <div class="insight-card strong"><div class="k">Strongest area</div><div class="v" id="strongestLabel">&mdash;</div></div>
+        <div class="insight-card priority"><div class="k">Potential improvement priority</div><div class="v" id="priorityLabel">&mdash;</div></div>
+      </div>
+
+      <div class="note-block" id="industryNote" style="display:none;"></div>
+      <div class="note-block" id="readinessGapNote" style="display:none;"></div>
+      <div class="note-block" id="connectionNote" style="display:none;"></div>
+
+      <h3 style="font-size:1rem;">Worth investigating</h3>
+      <ul class="rec-list" id="recList"></ul>
+      <p class="disclaimer">These are hypotheses worth investigating, not diagnoses. A self-report assessment can identify where to look &mdash; it can't establish why a pattern exists or confirm the right fix.</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;font-size:1.05rem;">Is a self-score enough?</h3>
+      <p style="font-size:0.9rem;">A self-study like this one is a useful starting point. It can surface potential strengths, blind spots, and opportunities. But a self-score has a real limit: it can't tell you <em>why</em> a problem exists, which interventions will actually work, or whether you're measuring the right things in the first place. An outside perspective tends to matter most when growth is outpacing internal process and development, when customer experience is inconsistent across teams or locations, when technology investment isn't producing the expected return, or when leadership keeps circling the same recurring problem without a clear root cause.</p>
+      <div class="cta-box">
+        <h3>From insight to action</h3>
+        <p id="ctaPersonalized">CQI360 works with growing organizations to investigate exactly these kinds of patterns, build practical solutions, and measure whether those solutions actually produce the improvement you expected.</p>
+        <div class="cta-actions">
+          <a class="cta-gold" id="requestReviewBtn" href="#">Request a Growth & Capability Review</a>
+          <button class="cta-outline" id="exportBtn">Export results as text</button>
+          <button class="cta-outline" id="printBtn">Print / Save as PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" id="backToAssessmentBtn">&larr; Back to answers</button>
+      <button class="btn btn-secondary" id="restartBtn">Start over</button>
+    </div>
+  </div>
+
+  <footer>
+    Built by <span class="fbrand">CQI360</span> &middot; Systems Clarity, Evidence Into Action &middot; <a href="https://cqi360.com" style="color:#8592A3;">cqi360.com</a>
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   CONFIG
+   ============================================================ */
+const CONFIG = {
+  stages: [
+    {id:'early', label:'Early', desc:'We are establishing our operations and building the foundation for repeatable results.'},
+    {id:'expanding', label:'Expanding', desc:'We are adding employees, customers, products, locations, or markets.'},
+    {id:'established', label:'Established', desc:'We have repeatable operations and are optimizing performance or pursuing new growth.'}
+  ],
+  industries: [
+    {id:'general', label:'General / Other', emphasis:''},
+    {id:'fashion', label:'Fashion & specialty retail', emphasis:'brand consistency, inventory workflows, and store-level onboarding'},
+    {id:'food', label:'Food & beverage', emphasis:'quality control, franchise or location readiness, and frontline turnover'},
+    {id:'hospitality', label:'Hospitality', emphasis:'service standards, guest experience consistency, and staffing depth'},
+    {id:'ecommerce', label:'E-commerce', emphasis:'customer support responsiveness, fulfillment reliability, and digital process consistency'},
+    {id:'manufacturing', label:'Manufacturing', emphasis:'workforce skill depth, quality systems, and operational efficiency'},
+    {id:'tech', label:'Technology startup', emphasis:'product adoption, team scaling, and knowledge transfer as the team grows'},
+    {id:'nonprofit', label:'Nonprofit', emphasis:'mission alignment, operational capacity, and impact measurement'}
+  ],
+  likert: [
+    {v:0, label:'Strongly Disagree'}, {v:1, label:'Disagree'}, {v:2, label:'Neutral'},
+    {v:3, label:'Agree'}, {v:4, label:'Strongly Agree'}, {v:'na', label:'Not Sure / N/A'}
+  ],
+  dimensions: [
+    {id:'leadership', label:'Leadership & Strategic Alignment',
+     question:'Can leaders translate growth ambitions into consistent priorities and coordinated execution?',
+     indicators:[
+      "Our leaders share a clear understanding of the organization's most important growth priorities.",
+      "Decisions made by different leaders or departments are generally aligned with our stated priorities.",
+      "Leaders communicate strategic priorities clearly enough that employees can act on them without constant clarification.",
+      "When priorities shift, leadership adjusts plans and resources in a coordinated way rather than in silos."
+     ],
+     rec: "Leadership priorities may not be consistently translating into coordinated execution. Worth investigating: do different departments interpret your growth priorities the same way, and are resourcing decisions actually aligned with them?",
+     causes: "priority clarity, cross-departmental alignment, or how resources get allocated"
+    },
+    {id:'people', label:'People & Workforce Capability',
+     question:'Are employees prepared, supported, and developed as responsibilities and expectations change?',
+     indicators:[
+      "New employees can become effective in their roles through a consistent, well-defined onboarding process.",
+      "Employees have access to the training they need as their responsibilities grow or change.",
+      "We have a clear plan for developing future leaders and filling key roles as the organization grows.",
+      "Managers are equipped to supervise larger or more complex teams as the organization expands."
+     ],
+     rec: "Workforce development may be lagging behind growth. Worth investigating: is onboarding producing consistently ready employees, and is there a real pipeline for future leaders, or is growth relying on a few overstretched people?",
+     causes: "onboarding, role clarity, training effectiveness, or succession planning"
+    },
+    {id:'operations', label:'Operational Processes & Scalability',
+     question:'Can the business deliver consistent results as transaction volumes, locations, and teams increase?',
+     indicators:[
+      "Our most important operational processes are documented, repeatable, and regularly improved.",
+      "We can maintain consistent quality and service levels as volume, locations, or team size increase.",
+      "Roles and responsibilities are clear enough that work doesn't depend on one or two key individuals.",
+      "We have identified which processes are likely to break down first as we continue to grow."
+     ],
+     rec: "Operational processes may not be scaling cleanly. Worth investigating: which processes depend on institutional knowledge rather than documentation, and where would the next jump in volume cause the most strain?",
+     causes: "process documentation, quality control, or dependency on one or two key people"
+    },
+    {id:'technology', label:'Technology & AI Readiness',
+     question:'Are digital systems helping people work effectively, or adding unnecessary complexity?',
+     indicators:[
+      "We have identified specific opportunities where automation or AI could measurably improve operations.",
+      "Our current systems and tools support the way we actually work, rather than adding extra steps.",
+      "Employees have the skills and confidence to use our core technology systems effectively.",
+      "We have a clear process for evaluating and adopting new technology as the organization grows."
+     ],
+     rec: "Technology may be adding friction rather than removing it. Worth investigating: are current tools actually used the way they were intended, and where is manual work substituting for a system that should exist?",
+     causes: "tool fit, user adoption, or how technology decisions get made and governed"
+    },
+    {id:'customer', label:'Customer Experience & Brand Consistency',
+     question:'Can the organization preserve its customer experience as it expands?',
+     indicators:[
+      "We have reliable ways to identify and address inconsistencies in the customer experience.",
+      "Our brand standards are clear enough that any location or team member can deliver a consistent experience.",
+      "We actively collect and use customer feedback to guide decisions.",
+      "Customer-facing teams are equipped to handle growth without sacrificing quality or responsiveness."
+     ],
+     rec: "Customer experience consistency may be harder to maintain as you grow. Worth investigating: do customers notice a difference between locations, channels, or team members, and is feedback actually reaching the people who can act on it?",
+     causes: "brand standards, feedback loops, or frontline capacity"
+    },
+    {id:'measurement', label:'Measurement, Learning & Continuous Improvement',
+     question:'Does the organization use evidence to make decisions, assess changes, and improve performance?',
+     indicators:[
+      "We routinely use performance data and employee feedback to identify and evaluate improvements.",
+      "We track the metrics that actually tell us whether our growth strategy is working.",
+      "When we make a change, we have a way to assess whether it produced the intended result.",
+      "Lessons learned in one part of the organization are shared and applied elsewhere."
+     ],
+     rec: "Decisions may be made more on instinct than on evidence. Worth investigating: do you know, with data, whether your last few operational changes actually worked, or are you assuming they did?",
+     causes: "data quality, which metrics get tracked, or follow-through on what the data shows"
+    }
+  ],
+  connections: [
+    {pair:['people','customer'], text:"Workforce and customer experience gaps often share a root cause: inconsistent onboarding tends to show up later as inconsistent service. If both are flagged, the hiring-to-floor pipeline is worth examining before anything else."},
+    {pair:['leadership','operations'], text:"When leadership alignment and operational scalability are both weak, process problems are often strategy problems in disguise &mdash; teams build inconsistent workarounds when priorities aren't clear."},
+    {pair:['technology','operations'], text:"Technology and operations gaps tend to compound each other. Before adding new tools, it's worth confirming the underlying process is one actually worth automating."},
+    {pair:['measurement','leadership'], text:"Without reliable measurement, it's hard to know whether a leadership-alignment fix actually worked. This combination often rewards starting with measurement first."}
+  ]
+};
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let answers = new Array(24).fill(null); // index aligns to flattened indicator order
+let stage = null;
+let industry = 'general';
+
+function flatIndicators(){
+  const out = [];
+  CONFIG.dimensions.forEach(d=>{
+    d.indicators.forEach(ind=>out.push({dim:d.id, text:ind}));
+  });
+  return out;
+}
+const FLAT = flatIndicators();
+
+/* ============================================================
+   INTRO SCREEN
+   ============================================================ */
+function renderStageOptions(){
+  const el = document.getElementById('stageOptions');
+  el.innerHTML = CONFIG.stages.map(s=>`
+    <label class="option-card" data-stage="${s.id}">
+      <input type="radio" name="stage" value="${s.id}">
+      <div><div class="ot">${s.label}</div><div class="od">${s.desc}</div></div>
+    </label>`).join('');
+  el.querySelectorAll('.option-card').forEach(card=>{
+    card.addEventListener('click', ()=>{
+      stage = card.dataset.stage;
+      el.querySelectorAll('.option-card').forEach(c=>c.classList.remove('selected'));
+      card.classList.add('selected');
+      card.querySelector('input').checked = true;
+      document.getElementById('beginBtn').disabled = false;
+    });
+  });
+}
+function renderIndustrySelect(){
+  const sel = document.getElementById('industrySelect');
+  sel.innerHTML = CONFIG.industries.map(i=>`<option value="${i.id}">${i.label}</option>`).join('');
+  sel.addEventListener('change', e=>{ industry = e.target.value; });
+}
+
+/* ============================================================
+   ASSESSMENT SCREEN
+   ============================================================ */
+function renderAssessment(){
+  const container = document.getElementById('dimContainer');
+  let idx = 0;
+  let html = '';
+  CONFIG.dimensions.forEach(d=>{
+    html += `<div class="dim-block"><h3>${d.label}</h3><div class="dq">${d.question}</div>`;
+    d.indicators.forEach(ind=>{
+      const i = idx;
+      html += `<div class="indicator"><p>${ind}</p><div class="likert" data-qidx="${i}">`;
+      CONFIG.likert.forEach(opt=>{
+        html += `<label class="${opt.v==='na'?'na':''}" data-val="${opt.v}">
+          <input type="radio" name="q${i}" value="${opt.v}">${opt.label}
+        </label>`;
+      });
+      html += `</div></div>`;
+      idx++;
+    });
+    html += `</div>`;
+  });
+  container.innerHTML = html;
+
+  container.querySelectorAll('.likert').forEach(group=>{
+    const qidx = parseInt(group.dataset.qidx,10);
+    group.querySelectorAll('label').forEach(lab=>{
+      lab.addEventListener('click', ()=>{
+        const val = lab.dataset.val === 'na' ? 'na' : parseInt(lab.dataset.val,10);
+        answers[qidx] = val;
+        group.querySelectorAll('label').forEach(l=>l.classList.remove('checked'));
+        lab.classList.add('checked');
+        lab.querySelector('input').checked = true;
+        updateProgress();
+      });
+    });
+  });
+}
+function updateProgress(){
+  const answered = answers.filter(a=>a!==null).length;
+  document.getElementById('progressFill').style.width = (answered/24*100)+'%';
+  document.getElementById('progressLabel').textContent = `${answered} of 24 answered`;
+  document.getElementById('viewResultsBtn').disabled = answered < 24;
+}
+
+/* ============================================================
+   SCORING
+   ============================================================ */
+function computeScores(){
+  const scores = {};
+  CONFIG.dimensions.forEach((d,di)=>{
+    const startIdx = CONFIG.dimensions.slice(0,di).reduce((s,dd)=>s+dd.indicators.length,0);
+    const vals = [];
+    for(let k=0;k<d.indicators.length;k++){
+      const v = answers[startIdx+k];
+      if(v!==null && v!=='na') vals.push(v);
+    }
+    scores[d.id] = vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length)*1.25 : null; // scale 0-4 -> 0-5
+  });
+  return scores;
+}
+function bandColor(score){
+  if(score===null) return '#C7CDD6';
+  if(score < 2.5) return 'var(--red)';
+  if(score < 3.75) return 'var(--amber)';
+  return 'var(--green)';
+}
+
+/* ============================================================
+   RESULTS
+   ============================================================ */
+function renderResults(){
+  const scores = computeScores();
+  const ranked = CONFIG.dimensions
+    .map(d=>({id:d.id, label:d.label, score:scores[d.id]}))
+    .filter(x=>x.score!==null)
+    .sort((a,b)=>b.score-a.score);
+
+  // Bar chart
+  const chart = document.getElementById('barChart');
+  chart.innerHTML = ranked.map(r=>{
+    const pct = Math.max((r.score/5*100), 2.5); // floor so a 0 score still shows a visible sliver at the zero mark
+    return `
+    <div class="score-row">
+      <div class="lbl">${r.label}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct.toFixed(1)}%;background:${bandColor(r.score)};"></div></div>
+      <div class="val">${r.score.toFixed(1)}/5</div>
+    </div>`;
+  }).join('');
+
+  const strongest = ranked[0];
+  const weakest = ranked[ranked.length-1];
+  const secondWeakest = ranked[ranked.length-2];
+
+  document.getElementById('strongestLabel').textContent = strongest.label;
+  document.getElementById('priorityLabel').textContent = weakest.label;
+
+  // Industry note
+  const ind = CONFIG.industries.find(i=>i.id===industry);
+  const indNote = document.getElementById('industryNote');
+  if(ind && ind.emphasis){
+    indNote.style.display = 'block';
+    indNote.innerHTML = `<h4>Industry context</h4><p>For organizations like yours, ${ind.emphasis} tend to be where growth pressure shows up first. Worth keeping in view alongside the pattern below.</p>`;
+  } else {
+    indNote.style.display = 'none';
+  }
+
+  // Readiness gap note
+  const overallVals = ranked.map(r=>r.score);
+  const overallAvg = overallVals.reduce((a,b)=>a+b,0)/overallVals.length;
+  const gapNote = document.getElementById('readinessGapNote');
+  if(stage !== 'early' && overallAvg < 2.75){
+    gapNote.style.display = 'block';
+    gapNote.innerHTML = `<h4>Readiness gap</h4><p>You described your organization as <strong>${CONFIG.stages.find(s=>s.id===stage).label.toLowerCase()}</strong>, which usually means rising demands on people, process, and systems. Your overall responses suggest capability may still be catching up to that pace &mdash; one of the most common precursors to operational strain during growth.</p>`;
+  } else if(stage === 'early' && overallAvg < 2.5){
+    gapNote.style.display = 'block';
+    gapNote.innerHTML = `<h4>Foundation first</h4><p>You're still establishing operations, so lower scores here aren't unusual. The opportunity is to build the foundation deliberately now, before growth makes it harder to revisit.</p>`;
+  } else {
+    gapNote.style.display = 'none';
+  }
+
+  // Connection note
+  const connNote = document.getElementById('connectionNote');
+  const match = CONFIG.connections.find(c=>
+    (c.pair[0]===weakest.id && c.pair[1]===secondWeakest.id) ||
+    (c.pair[1]===weakest.id && c.pair[0]===secondWeakest.id)
+  );
+  connNote.style.display = 'block';
+  connNote.innerHTML = `<h4>A possible connection</h4><p>${match ? match.text : `Your two lowest-scoring areas, ${weakest.label} and ${secondWeakest.label}, don't have an obvious direct link in our model, but addressing the lower-scoring one first is likely to have the broadest ripple effect across the other.`}</p>`;
+
+  // Recommendations
+  const recDims = [weakest, secondWeakest];
+  const recTexts = recDims.map(r=>CONFIG.dimensions.find(d=>d.id===r.id).rec);
+  recTexts.push("Revisit this self-study again in two to three months. The most useful signal usually isn't a single score, it's whether these patterns are improving, holding steady, or getting worse.");
+  document.getElementById('recList').innerHTML = recTexts.map((t,i)=>`
+    <li><div class="num">${i+1}</div><div class="txt">${t}</div></li>`).join('');
+
+  // Personalize the consulting CTA copy with the respondent's actual lowest-rated dimension
+  const weakestDim = CONFIG.dimensions.find(d=>d.id===weakest.id);
+  document.getElementById('ctaPersonalized').textContent =
+    `Your responses suggest ${weakest.label.toLowerCase()} may warrant closer investigation. CQI360 can help examine whether the underlying issue involves ${weakestDim.causes}.`;
+
+  // Wire up the review-request CTA with the respondent's actual results
+  const reviewLink = document.getElementById('requestReviewBtn');
+  const subject = encodeURIComponent('Growth & Capability Review Request (GrowthReady 360 results)');
+  const body = encodeURIComponent(compileResultsText() + '\nI\'d like to talk through these results.\n\nName:\nOrganization:\nBest way to reach me:\n');
+  reviewLink.href = `mailto:david.green@cqi360.com?subject=${subject}&body=${body}`;
+}
+
+/* ============================================================
+   EXPORT
+   ============================================================ */
+function compileResultsText(){
+  const scores = computeScores();
+  let out = 'GROWTHREADY 360 — SELF-STUDY RESULTS\n' + new Date().toLocaleDateString() + '\n\n';
+  out += `Growth stage: ${CONFIG.stages.find(s=>s.id===stage).label}\n`;
+  const ind = CONFIG.industries.find(i=>i.id===industry);
+  out += `Industry: ${ind.label}\n\n`;
+  out += 'DIMENSION SCORES (0-5 scale)\n' + '-'.repeat(40) + '\n';
+  CONFIG.dimensions.forEach(d=>{
+    const s = scores[d.id];
+    out += `${d.label}: ${s!==null ? s.toFixed(1)+'/5' : 'not answered'}\n`;
+  });
+  out += '\nThis is a self-reported diagnostic, not a validated benchmark. Generated with GrowthReady 360, a CQI360 self-study tool.\n';
+  return out;
+}
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+document.getElementById('beginBtn').addEventListener('click', ()=>{
+  renderAssessment();
+  updateProgress();
+  showScreen('screen-assessment');
+});
+document.getElementById('backToIntroBtn').addEventListener('click', ()=> showScreen('screen-intro'));
+document.getElementById('viewResultsBtn').addEventListener('click', ()=>{
+  renderResults();
+  showScreen('screen-results');
+});
+document.getElementById('backToAssessmentBtn').addEventListener('click', ()=> showScreen('screen-assessment'));
+document.getElementById('restartBtn').addEventListener('click', ()=>{
+  answers = new Array(24).fill(null);
+  stage = null; industry = 'general';
+  document.getElementById('beginBtn').disabled = true;
+  document.querySelectorAll('#stageOptions .option-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('industrySelect').value = 'general';
+  showScreen('screen-intro');
+});
+document.getElementById('exportBtn').addEventListener('click', ()=>{
+  const blob = new Blob([compileResultsText()], {type:'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'growthready-360-results.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+document.getElementById('printBtn').addEventListener('click', ()=> window.print());
+
+renderStageOptions();
+renderIndustrySelect();
+</script>
+</body>
+</html>
